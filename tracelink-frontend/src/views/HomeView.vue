@@ -5,13 +5,19 @@
       <p>Your trusted system for tracking missing persons and unidentified bodies.</p>
 
       <div class="buttons">
-        <router-link to="/add-missing" class="btn">🚔 Police: Report Missing Person</router-link>
-        <router-link to="/family-access" class="btn">👨‍👩‍👧 Family: Check Status</router-link>
-        <router-link to="/hospital" class="btn">🏥 Hospital: Report Unidentified Body</router-link>
+        <router-link to="/login-police" class="btn">🚔 Police Login</router-link>
+        <router-link to="/login-family" class="btn">👨‍👩‍👧 Family Access</router-link>
+        <router-link to="/login-hospital" class="btn">🏥 Hospital Login</router-link>
       </div>
     </div>
   </div>
 </template>
+
+<script>
+export default {
+  name: 'HomeView'
+}
+</script>
 
 <style scoped>
 .home {

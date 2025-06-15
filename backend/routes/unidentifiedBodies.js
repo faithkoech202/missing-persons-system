@@ -1,3 +1,21 @@
+const express = require('express');
+const router = express.Router();
+const multer = require('multer');
+const path = require('path');
+const db = require('../db');
+
+// File upload setup
+const storage = multer.diskStorage({
+  destination: function (req, file, cb) {
+    cb(null, 'uploads/'); // Make sure this folder exists
+  },
+  filename: function (req, file, cb) {
+    cb(null, Date.now() + path.extname(file.originalname));
+  }
+});
+const upload = multer({ storage });
+
+// POST route to add an unidentified body
 router.post('/', upload.single('photo'), async (req, res) => {
   const { gender, age_estimate, found_location, date_found, physical_description } = req.body;
   const photo_path = req.file ? req.file.filename : null;
@@ -11,3 +29,33 @@ router.post('/', upload.single('photo'), async (req, res) => {
 
   res.status(201).json({ message: 'Unidentified body report submitted' });
 });
+
+// GET route to list all unidentified bodies
+router.get('/', async (req, res) => {
+  try {
+    const [rows] = await db.query('SELECT * FROM unidentified_bodies ORDER BY date_found DESC');
+    res.json(rows);
+  } catch (err) {
+    console.error('Error fetching unidentified bodies:', err);
+    res.status(500).json({ message: 'Internal server error' });
+  }
+});
+// GET a single unidentified body by ID
+router.get('/:id', async (req, res) => {
+  const { id } = req.params;
+
+  try {
+    const [rows] = await db.query('SELECT * FROM unidentified_bodies WHERE id = ?', [id]);
+
+    if (rows.length === 0) {
+      return res.status(404).json({ message: 'Unidentified body not found' });
+    }
+
+    res.json(rows[0]);
+  } catch (err) {
+    console.error('Error retrieving unidentified body:', err);
+    res.status(500).json({ message: 'Internal server error' });
+  }
+});
+
+module.exports = router;
