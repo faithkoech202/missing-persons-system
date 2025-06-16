@@ -29,7 +29,8 @@ export default {
       // Dummy check – replace with API call later
       if (this.accessCode.length === 6 && this.email.includes('@')) {
         localStorage.setItem('userRole', 'family');
-        this.$router.push('/family-access');
+        this.$router.push('/family-dashboard');
+
       } else {
         this.error = 'Invalid email or access code.';
       }

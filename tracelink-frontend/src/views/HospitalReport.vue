@@ -86,13 +86,13 @@ export default {
 </script>
 
 <style scoped>
-.container {
+.report-form-container {
   max-width: 600px;
-  margin: 50px auto;
+  margin: 40px auto;
   padding: 30px;
   background: #fff;
   border-radius: 10px;
-  box-shadow: 0 0 12px rgba(0, 0, 0, 0.1);
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
 }
 
 h2 {
@@ -108,18 +108,19 @@ h2 {
 label {
   display: block;
   font-weight: 600;
-  margin-bottom: 5px;
+  margin-top: 15px;
 }
 
 input, select {
   width: 100%;
   padding: 10px;
+   margin-top: 5px;
   border: 1px solid #ccc;
   border-radius: 6px;
 }
 
 button {
-  margin-top: 10px;
+  margin-top: 20px;
   width: 100%;
   background: #800000;
   color: white;

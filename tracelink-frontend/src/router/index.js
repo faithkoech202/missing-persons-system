@@ -13,7 +13,7 @@ import SearchMissing from '../views/SearchMissing.vue';
 import MatchUnidentified from '../views/MatchUnidentified.vue';
 import SearchUnidentified from '../views/SearchUnidentified.vue';
 import AllUnidentified from '../views/AllUnidentified.vue';
-
+import FamilyDashboard from '../views/FamilyDashboard.vue';
 
 const routes = [
   { path: '/', name: 'Home', component: HomeView },
@@ -32,6 +32,7 @@ const routes = [
   { path: '/search-unidentified', name: 'SearchUnidentified', component: SearchUnidentified },
   { path: '/hospital-dashboard', name: 'HospitalDashboard', component: () => import('../views/HospitalDashboard.vue') },
   { path: '/all-unidentified', name: 'AllUnidentified', component: AllUnidentified },
+  {path: '/family-dashboard',  name: 'FamilyDashboard', component: FamilyDashboard},
 ];
 
 const router = createRouter({

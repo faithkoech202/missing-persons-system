@@ -15,14 +15,17 @@ app.use(express.json());
 const missingPersonsRoutes = require('./routes/missingPersons');
 const unidentifiedBodiesRoutes = require('./routes/unidentifiedBodies'); 
 const matchRoutes = require('./routes/match');
+const familyAccessRoutes = require('./routes/familyAccess');
 
 // Use routes
 app.use('/api/missing-persons', missingPersonsRoutes);
 app.use('/api/unidentified-bodies', unidentifiedBodiesRoutes);  
 app.use('/api/match', matchRoutes);
+app.use('/api/unidentified-bodies', require('./routes/unidentifiedBodies'));
+app.use('/api/family-access', familyAccessRoutes);
 
 // Start the server
-const PORT = process.env.PORT || 3000;
+const PORT = process.env.PORT || 5000;
 app.listen(PORT, () => {
   console.log(`Server running on port ${PORT}`);
 });
