@@ -29,7 +29,7 @@ export default {
       // Dummy login check — replace with real backend call
       if (this.username === 'hospital' && this.password === '1234') {
         localStorage.setItem('userRole', 'hospital');
-        this.$router.push('/hospital');
+        this.$router.push('/hospital-dashboard'); 
       } else {
         this.error = 'Invalid hospital credentials.';
       }

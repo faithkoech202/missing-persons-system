@@ -180,4 +180,27 @@ router.get('/family-access/:access_code', async (req, res) => {
   }
 });
 
+// GET /api/missing-persons/search?query=...
+router.get('/search', async (req, res) => {
+  const query = req.query.query;
+
+  if (!query) {
+    return res.status(400).json({ error: 'Query parameter is required.' });
+  }
+
+  const sql = `
+    SELECT * FROM missing_persons
+    WHERE full_name LIKE ? OR last_seen_location LIKE ?
+  `;
+  const searchTerm = `%${query}%`;
+
+  try {
+    const [results] = await db.query(sql, [searchTerm, searchTerm]);
+    res.json(results);
+  } catch (err) {
+    console.error('Error in search:', err);
+    res.status(500).json({ error: 'Internal server error' });
+  }
+});
+
 module.exports = router;

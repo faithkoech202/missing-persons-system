@@ -29,7 +29,7 @@ export default {
       // Temporary dummy login logic
       if (this.username === 'police' && this.password === '1234') {
         localStorage.setItem('userRole', 'police');
-        this.$router.push('/add-missing');
+        this.$router.push('/police-dashboard');
       } else {
         this.error = 'Invalid credentials';
       }

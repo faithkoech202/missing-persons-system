@@ -1,36 +1,34 @@
+// GET /api/match-bodies
 const express = require('express');
 const router = express.Router();
-const db = require('../db');
+const db = require('../db'); // Update path as needed
 
-// POST /api/match
-router.post('/', async (req, res) => {
-  const { gender, age_estimate, found_location, physical_description } = req.body;
+router.get('/match-bodies', async (req, res) => {
+  const sql = `
+    SELECT 
+      mp.id AS missing_id,
+      mp.full_name AS missing_name,
+      ub.id AS body_id,
+      ub.description AS body_description,
+      ub.found_location
+    FROM 
+      missing_persons mp
+    JOIN 
+      unidentified_bodies ub
+    ON 
+      mp.gender = ub.gender
+      AND ABS(DATEDIFF(mp.date_last_seen, ub.date_found)) <= 14
+      AND mp.last_seen_location = ub.found_location
+  `;
 
   try {
-    const sql = `
-      SELECT * FROM missing_persons
-      WHERE gender = ?
-      AND ABS(TIMESTAMPDIFF(YEAR, date_of_birth, CURDATE()) - ?) <= 5
-      AND last_seen_location LIKE ?
-      AND physical_description LIKE ?
-    `;
-
-    const [matches] = await db.query(sql, [
-      gender,
-      age_estimate,
-      `%${found_location}%`,
-      `%${physical_description}%`
-    ]);
-
-    if (matches.length === 0) {
-      return res.status(404).json({ message: 'No potential match found' });
-    }
-
-    res.json({ matches });
-  } catch (error) {
-    console.error('Error while matching:', error);
-    res.status(500).json({ message: 'Server error' });
+    const [results] = await db.query(sql);
+    res.json(results);
+  } catch (err) {
+    console.error('Error matching bodies:', err);
+    res.status(500).json({ error: 'Internal server error' });
   }
 });
 
 module.exports = router;
+

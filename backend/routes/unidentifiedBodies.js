@@ -40,6 +40,7 @@ router.get('/', async (req, res) => {
     res.status(500).json({ message: 'Internal server error' });
   }
 });
+
 // GET a single unidentified body by ID
 router.get('/:id', async (req, res) => {
   const { id } = req.params;
@@ -55,6 +56,34 @@ router.get('/:id', async (req, res) => {
   } catch (err) {
     console.error('Error retrieving unidentified body:', err);
     res.status(500).json({ message: 'Internal server error' });
+  }
+});
+
+router.get('/search', async (req, res) => {
+  const { date_found, found_location, gender } = req.query;
+
+  let sql = `SELECT * FROM unidentified_bodies WHERE 1=1`;
+  const params = [];
+
+  if (date_found) {
+    sql += ` AND date_found = ?`;
+    params.push(date_found);
+  }
+  if (found_location) {
+    sql += ` AND found_location LIKE ?`;
+    params.push(`%${found_location}%`);
+  }
+  if (gender) {
+    sql += ` AND gender = ?`;
+    params.push(gender);
+  }
+
+  try {
+    const [rows] = await db.query(sql, params);
+    res.json(rows);
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ message: 'Server error while searching.' });
   }
 });
 

@@ -1,5 +1,5 @@
 <template>
-  <div class="container">
+  <div class="form-container">
     <h2>🏥 Report Unidentified Body</h2>
     <form @submit.prevent="submitForm" enctype="multipart/form-data">
       <div class="form-group">
@@ -97,6 +97,7 @@ export default {
 
 h2 {
   text-align: center;
+   margin-bottom: 20px;
   color: #800000;
 }
 
@@ -105,10 +106,12 @@ h2 {
 }
 
 label {
+  display: block;
   font-weight: 600;
+  margin-bottom: 5px;
 }
 
-input, select, textarea {
+input, select {
   width: 100%;
   padding: 10px;
   border: 1px solid #ccc;
