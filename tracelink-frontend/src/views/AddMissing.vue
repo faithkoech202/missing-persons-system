@@ -1,7 +1,14 @@
 <template>
   <div class="container">
     <h2>🚔 Report a Missing Person</h2>
-    <form @submit.prevent="submitForm">
+
+    <div v-if="success" class="success-message">
+      <p>✅ Missing person reported successfully!</p>
+      <p><strong>Access Code:</strong> {{ accessCode }}</p>
+      <p>Give this code to the family so they can track the case.</p>
+    </div>
+
+    <form @submit.prevent="submitForm" v-if="!success">
       <div class="form-group">
         <label>Full Name</label>
         <input v-model="form.full_name" required />
@@ -41,30 +48,30 @@
         <input v-model="form.reporter_phone" />
       </div>
 
-<div class="form-group">
-  <label>Upload Photo</label>
-  <input type="file" @change="handleFileUpload" />
-</div>
+      <div class="form-group">
+        <label>Upload Photo</label>
+        <input type="file" @change="handleFileUpload" />
+      </div>
 
-<div class="form-group">
-  <label>Distinguishing Marks</label>
-  <input v-model="form.distinguishing_marks" />
-</div>
+      <div class="form-group">
+        <label>Distinguishing Marks</label>
+        <input v-model="form.distinguishing_marks" />
+      </div>
 
-<div class="form-group">
-  <label>Medical Conditions</label>
-  <input v-model="form.medical_conditions" />
-</div>
+      <div class="form-group">
+        <label>Medical Conditions</label>
+        <input v-model="form.medical_conditions" />
+      </div>
 
-<div class="form-group">
-  <label>Social Media Handles</label>
-  <input v-model="form.social_media" />
-</div>
+      <div class="form-group">
+        <label>Social Media Handles</label>
+        <input v-model="form.social_media" />
+      </div>
 
-<div class="form-group">
-  <label>Additional Description</label>
-  <textarea v-model="form.description" rows="3"></textarea>
-</div>
+      <div class="form-group">
+        <label>Additional Description</label>
+        <textarea v-model="form.description" rows="3"></textarea>
+      </div>
 
       <button type="submit">Submit Report</button>
     </form>
@@ -76,37 +83,71 @@ export default {
   data() {
     return {
       form: {
-  full_name: '',
-  date_of_birth: '',
-  gender: '',
-  last_seen_location: '',
-  date_last_seen: '',
-  reporter_name: '',
-  reporter_phone: '',
-  distinguishing_marks: '',
-  medical_conditions: '',
-  social_media: '',
-  description: '',
-  photo: null
-}
-    }
+        full_name: '',
+        date_of_birth: '',
+        gender: '',
+        last_seen_location: '',
+        date_last_seen: '',
+        reporter_name: '',
+        reporter_phone: '',
+        distinguishing_marks: '',
+        medical_conditions: '',
+        social_media: '',
+        description: '',
+        photo: null
+      },
+      accessCode: '',
+      success: false
+    };
   },
   methods: {
+    handleFileUpload(event) {
+      this.form.photo = event.target.files[0];
+    },
     async submitForm() {
-      try {
-        const res = await fetch('http://localhost:3000/api/missing-persons', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify(this.form)
-        });
-        const data = await res.json();
-        alert('Success! Access Code: ' + data.access_code);
-      } catch (err) {
-        alert('Something went wrong.');
+      const formData = new FormData();
+      for (const key in this.form) {
+        formData.append(key, this.form[key]);
       }
+
+      try {
+        const res = await fetch('http://localhost:5000/api/missing-persons', {
+          method: 'POST',
+          body: formData
+        });
+
+        const data = await res.json();
+
+        if (res.ok) {
+          this.accessCode = data.access_code;
+          this.success = true;
+          this.resetForm();
+        } else {
+          alert(data.message || 'Something went wrong.');
+        }
+      } catch (err) {
+        alert('Error submitting form.');
+        console.error(err);
+      }
+    },
+    resetForm() {
+      this.form = {
+        full_name: '',
+        date_of_birth: '',
+        gender: '',
+        last_seen_location: '',
+        date_last_seen: '',
+        reporter_name: '',
+        reporter_phone: '',
+        distinguishing_marks: '',
+        medical_conditions: '',
+        social_media: '',
+        description: '',
+        photo: null
+      };
     }
   }
-}
+};
 </script>
 
 <style scoped>
@@ -135,11 +176,14 @@ label {
   margin-bottom: 5px;
 }
 
-input, select {
+input,
+select,
+textarea {
   width: 100%;
   padding: 10px;
   border: 1px solid #ccc;
   border-radius: 6px;
+  font-size: 14px;
 }
 
 button {
@@ -156,5 +200,13 @@ button {
 
 button:hover {
   background: #00509e;
+}
+
+.success-message {
+  background-color: #e6ffed;
+  border-left: 5px solid #28a745;
+  padding: 15px;
+  margin-bottom: 20px;
+  border-radius: 6px;
 }
 </style>

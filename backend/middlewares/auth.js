@@ -1,4 +1,4 @@
-// middlewares/auth.js
+// backend/middlewares/auth.js
 const jwt = require('jsonwebtoken');
 
 function verifyPolice(req, res, next) {
