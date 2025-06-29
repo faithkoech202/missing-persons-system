@@ -25,13 +25,40 @@ export default {
     };
   },
   methods: {
-    login() {
-      // Temporary dummy login logic
-      if (this.username === 'police' && this.password === '1234') {
-        localStorage.setItem('userRole', 'police');
-        this.$router.push('/police-dashboard');
-      } else {
-        this.error = 'Invalid credentials';
+    async login() {
+      try {
+        const response = await fetch('http://localhost:5000/api/login', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify({
+            username: this.username,
+            password: this.password
+          })
+        });
+
+        const data = await response.json();
+        console.log('Login response:', data); // <-- Debug log
+
+        if (!response.ok) {
+          this.error = data.message || 'Invalid credentials';
+          return;
+        }
+
+        // Store token and role
+        localStorage.setItem('token', data.token);
+        localStorage.setItem('userRole', data.role);
+
+        // Navigate if user is police
+        if (data.role === 'police') {
+          this.$router.push('/police-dashboard');
+        } else {
+          this.error = 'Not authorized as police';
+        }
+      } catch (err) {
+        this.error = 'Login failed. Try again.';
+        console.error(err);
       }
     }
   }
@@ -70,4 +97,3 @@ button {
   margin-top: 10px;
 }
 </style>
-

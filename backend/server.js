@@ -3,7 +3,7 @@ require('dotenv').config();
 const express = require('express');
 const cors = require('cors');
 const dotenv = require('dotenv');
-const db = require('./db');
+const db = require('./config/db');
 
 dotenv.config();
 
@@ -16,6 +16,7 @@ const missingPersonsRoutes = require('./routes/missingPersons');
 const unidentifiedBodiesRoutes = require('./routes/unidentifiedBodies'); 
 const matchRoutes = require('./routes/match');
 const familyAccessRoutes = require('./routes/familyAccess');
+const authRoutes = require('./routes/auth');
 
 // Use routes
 app.use('/api/missing-persons', missingPersonsRoutes);
@@ -23,6 +24,8 @@ app.use('/api/unidentified-bodies', unidentifiedBodiesRoutes);
 app.use('/api/match', matchRoutes);
 app.use('/api/unidentified-bodies', require('./routes/unidentifiedBodies'));
 app.use('/api/family-access', familyAccessRoutes);
+app.use('/api', authRoutes);
+app.use('/api/auth', require('./routes/auth'));
 
 // Start the server
 const PORT = process.env.PORT || 5000;

@@ -1,10 +1,14 @@
 const express = require('express');
 const router = express.Router();
-const db = require('../db');
-const { verifyPolice } = require('../middlewares/auth');
+const db = require('../config/db');
+const verifyToken = require('../middlewares/auth');
+const multer = require('multer');
+
+const storage = multer.memoryStorage();
+const upload = multer({ storage: storage });
 
 // POST /api/missing-persons
-router.post('/', verifyPolice, async (req, res) =>  {
+router.post('/', verifyToken, upload.single('photo'), (req, res) =>  {
   const {
     full_name,
     date_of_birth,
@@ -26,13 +30,15 @@ router.post('/', verifyPolice, async (req, res) =>  {
     date_reported
   } = req.body;
 
+const photoBuffer = req.file ? req.file.buffer : null;
+
   const sql = `
     INSERT INTO missing_persons (
       full_name, date_of_birth, gender, height, weight, eye_color,
       hair_color, complexion, physical_marks, last_seen_location,
       last_seen_date, last_seen_wearing, behavior_notes,
       contact_name, contact_phone, reporter_name,
-      reporter_relation, date_reported
+      reporter_relation, date_reported, photo
     )
     VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
   `;
@@ -55,12 +61,14 @@ router.post('/', verifyPolice, async (req, res) =>  {
     contact_phone,
     reporter_name,
     reporter_relation,
-    date_reported
+    date_reported,
+    photoBuffer
   ];
 
   db.query(sql, values, (err, result) => {
     if (err) {
-      console.error('Error inserting data:', err);
+      
+    console.error('MySQL Error:', err.sqlMessage || err);
       return res.status(500).json({ message: 'Failed to add missing person' });
     }
 
@@ -200,6 +208,50 @@ router.get('/search', async (req, res) => {
   } catch (err) {
     console.error('Error in search:', err);
     res.status(500).json({ error: 'Internal server error' });
+  }
+});
+
+const { v4: uuidv4 } = require('uuid');
+
+router.post('/', async (req, res) => {
+  const {
+    full_name,
+    date_of_birth,
+    gender,
+    last_seen_location,
+    date_last_seen,
+    clothing_description,
+    physical_description,
+    special_characteristics,
+    behavior_notes,
+    reporter_name,
+    reporter_phone,
+    reporter_relationship
+  } = req.body;
+
+  const access_code = uuidv4().slice(0, 8); // 8-character code
+
+  const sql = `
+    INSERT INTO missing_persons (
+      full_name, date_of_birth, gender, last_seen_location, date_last_seen,
+      clothing_description, physical_description, special_characteristics,
+      behavior_notes, reporter_name, reporter_phone, reporter_relationship,
+      access_code
+    ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+  `;
+
+  try {
+    await db.query(sql, [
+      full_name, date_of_birth, gender, last_seen_location, date_last_seen,
+      clothing_description, physical_description, special_characteristics,
+      behavior_notes, reporter_name, reporter_phone, reporter_relationship,
+      access_code
+    ]);
+
+    res.status(201).json({ message: 'Missing person reported successfully', access_code });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ message: 'Failed to report missing person' });
   }
 });
 

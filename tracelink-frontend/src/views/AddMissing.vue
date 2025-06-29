@@ -110,25 +110,31 @@ export default {
         formData.append(key, this.form[key]);
       }
 
+       const token = localStorage.getItem('token');
+         console.log('Submitting with token:', token)
+       
       try {
-        const res = await fetch('http://localhost:5000/api/missing-persons', {
-          method: 'POST',
-          body: formData
-        });
+  const res = await fetch('http://localhost:5000/api/missing-persons', {
+    method: 'POST',
+    headers: {
+      Authorization: `Bearer ${localStorage.getItem('token')}`,
+    },
+    body: formData
+  });
 
-        const data = await res.json();
+  const data = await res.json();  
 
-        if (res.ok) {
-          this.accessCode = data.access_code;
-          this.success = true;
-          this.resetForm();
-        } else {
-          alert(data.message || 'Something went wrong.');
-        }
-      } catch (err) {
-        alert('Error submitting form.');
-        console.error(err);
-      }
+  if (res.ok) {
+    this.accessCode = data.access_code;
+    this.success = true;
+    this.resetForm();
+  } else {
+    alert(data.message || 'Something went wrong.');
+  }
+} catch (err) {
+  alert('Error submitting form.');
+  console.error(err);
+}
     },
     resetForm() {
       this.form = {

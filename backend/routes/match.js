@@ -1,7 +1,7 @@
 // GET /api/match-bodies
 const express = require('express');
 const router = express.Router();
-const db = require('../db'); // Update path as needed
+const db = require('../config/db');
 
 router.get('/match-bodies', async (req, res) => {
   const sql = `
