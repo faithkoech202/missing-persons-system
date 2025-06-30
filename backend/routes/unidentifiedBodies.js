@@ -1,33 +1,59 @@
 const express = require('express');
 const router = express.Router();
+const db = require('../config/db');
 const multer = require('multer');
 const path = require('path');
-const db = require('../config/db');
 
-// File upload setup
+// Set up storage for photos
 const storage = multer.diskStorage({
-  destination: function (req, file, cb) {
-    cb(null, 'uploads/'); // Make sure this folder exists
+  destination: (req, file, cb) => {
+    cb(null, 'uploads/');
   },
-  filename: function (req, file, cb) {
-    cb(null, Date.now() + path.extname(file.originalname));
+  filename: (req, file, cb) => {
+    const uniqueName = `${Date.now()}-${file.originalname}`;
+    cb(null, uniqueName);
   }
 });
+
 const upload = multer({ storage });
 
-// POST route to add an unidentified body
+// POST /api/unidentified-bodies
 router.post('/', upload.single('photo'), async (req, res) => {
-  const { gender, age_estimate, found_location, date_found, physical_description } = req.body;
-  const photo_path = req.file ? req.file.filename : null;
+  const {
+    gender,
+    age_estimate,
+    found_location,
+    date_found,
+    physical_description,
+    hospital_name,
+    hospital_contact
+  } = req.body;
+
+  const photo = req.file ? req.file.filename : null;
 
   const sql = `
     INSERT INTO unidentified_bodies 
-    (gender, age_estimate, found_location, date_found, physical_description, photo) 
-    VALUES (?, ?, ?, ?, ?, ?)
+    (gender, age_estimate, found_location, date_found, physical_description, photo, hospital_name, hospital_contact)
+    VALUES (?, ?, ?, ?, ?, ?, ?, ?)
   `;
-  await db.query(sql, [gender, age_estimate, found_location, date_found, physical_description, photo_path]);
 
-  res.status(201).json({ message: 'Unidentified body report submitted' });
+  try {
+    await db.query(sql, [
+      gender,
+      age_estimate,
+      found_location,
+      date_found,
+      physical_description,
+      photo,
+      hospital_name,
+      hospital_contact
+    ]);
+
+    res.status(201).json({ message: 'Unidentified body reported successfully' });
+  } catch (err) {
+    console.error('Database insert error:', err);
+    res.status(500).json({ message: 'Failed to report unidentified body' });
+  }
 });
 
 // GET route to list all unidentified bodies
@@ -42,48 +68,34 @@ router.get('/', async (req, res) => {
 });
 
 // GET a single unidentified body by ID
-router.get('/:id', async (req, res) => {
-  const { id } = req.params;
-
-  try {
-    const [rows] = await db.query('SELECT * FROM unidentified_bodies WHERE id = ?', [id]);
-
-    if (rows.length === 0) {
-      return res.status(404).json({ message: 'Unidentified body not found' });
-    }
-
-    res.json(rows[0]);
-  } catch (err) {
-    console.error('Error retrieving unidentified body:', err);
-    res.status(500).json({ message: 'Internal server error' });
-  }
-});
-
+// GET /api/unidentified-bodies/search?gender=male&body_found_location=Nakuru
 router.get('/search', async (req, res) => {
-  const { date_found, found_location, gender } = req.query;
+  const { date_found, gender, body_found_location } = req.query;
 
-  let sql = `SELECT * FROM unidentified_bodies WHERE 1=1`;
+  let sql = 'SELECT * FROM unidentified_bodies WHERE 1=1';
   const params = [];
 
+  if (gender) {
+    sql += ' AND gender = ?';
+    params.push(gender);
+  }
+
   if (date_found) {
-    sql += ` AND date_found = ?`;
+    sql += ' AND date_found = ?';
     params.push(date_found);
   }
-  if (found_location) {
-    sql += ` AND found_location LIKE ?`;
-    params.push(`%${found_location}%`);
-  }
-  if (gender) {
-    sql += ` AND gender = ?`;
-    params.push(gender);
+
+  if (body_found_location) {
+    sql += ' AND body_found_location LIKE ?';
+    params.push(`%${body_found_location}%`);
   }
 
   try {
     const [rows] = await db.query(sql, params);
     res.json(rows);
   } catch (err) {
-    console.error(err);
-    res.status(500).json({ message: 'Server error while searching.' });
+    console.error('Error performing search:', err);
+    res.status(500).json({ message: 'Server error during search' });
   }
 });
 

@@ -6,7 +6,7 @@
   "scripts": {
     "dev": "nodemon backend/server.js",
     "start": "node backend/server.js",
-     "build": "cd tracelink-frontend && npm run build",
+    "build": "cd tracelink-frontend && npm run build",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "main": "backend/server.js",
@@ -19,6 +19,7 @@
     "multer": "^2.0.1",
     "mysql2": "^3.14.1",
     "register-service-worker": "^1.7.2",
+    "sweetalert2": "^11.22.1",
     "uuid": "^11.1.0"
   },
   "devDependencies": {

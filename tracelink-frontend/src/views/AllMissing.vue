@@ -6,41 +6,39 @@
     <table>
       <thead>
         <tr>
-          <th>Full Name</th>
-          <th>Date of Birth</th>
-          <th>Gender</th>
-          <th>Last Seen Location</th>
-          <th>Date Last Seen</th>
-          <th>Clothing</th>
-          <th>Physical Description</th>
-          <th>Special Characteristics</th>
-          <th>Behavior Notes</th>
-          <th>Reporter Name</th>
-          <th>Reporter Phone</th>
-          <th>Relationship</th>
-          <th>Date Reported</th>
-          <th>Actions</th>
+      <th>Name</th>
+      <th>DOB</th>
+      <th>Gender</th>
+      <th>Last Seen</th>
+      <th>Date Last Seen</th>
+      <th>Marks</th>
+      <th>Medical</th>
+      <th>Social Media</th>
+      <th>Description</th>
+      <th>Reporter Name</th>
+      <th>Reporter Phone</th>
+      <th>Access Code</th>
+      <th>Date Reported</th>
         </tr>
       </thead>
       <tbody>
         <tr v-for="person in missingPersons" :key="person.id">
           <td>{{ person.full_name }}</td>
-          <td>{{ person.date_of_birth }}</td>
-          <td>{{ person.gender }}</td>
-          <td>{{ person.last_seen_location }}</td>
-          <td>{{ person.date_last_seen }}</td>
-          <td>{{ person.clothing_description }}</td>
-          <td>{{ person.physical_description }}</td>
-          <td>{{ person.special_characteristics }}</td>
-          <td>{{ person.behavior_notes }}</td>
-          <td>{{ person.reporter_name }}</td>
-          <td>{{ person.reporter_phone }}</td>
-          <td>{{ person.reporter_relationship }}</td>
-          <td>{{ person.date_reported }}</td>
+      <td>{{ person.date_of_birth }}</td>
+      <td>{{ person.gender }}</td>
+      <td>{{ person.last_seen_location }}</td>
+      <td>{{ person.date_last_seen }}</td>
+      <td>{{ person.distinguishing_marks }}</td>
+      <td>{{ person.medical_conditions }}</td>
+      <td>{{ person.social_media }}</td>
+      <td>{{ person.description }}</td>
+      <td>{{ person.reporter_name }}</td>
+      <td>{{ person.reporter_phone }}</td>
+      <td>{{ person.access_code }}</td>
+      <td>{{ person.date_reported }}</td>
           <td>
             <!-- ✅ View Details Link -->
             <router-link :to="`/missing/${person.id}`" class="view-link">View</router-link>
-            <router-link :to="`/missing/${person.id}`">View</router-link> |
             <router-link :to="`/missing/${person.id}/edit`">Edit</router-link>
           </td>
         </tr>

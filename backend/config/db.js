@@ -1,21 +1,25 @@
 // backend/config/db.js
-const mysql = require('mysql2');
+const mysql = require('mysql2/promise');
 const dotenv = require('dotenv');
 dotenv.config();
 
-const connection = mysql.createConnection({
-  host: process.env.DB_HOST || 'localhost',
-  user: process.env.DB_USER || 'Snowbit',
-  password: process.env.DB_PASSWORD || '5am15.tl',
-  database: process.env.DB_NAME || 'tracelink_db'
-});
+let connection;
 
-connection.connect(err => {
-  if (err) {
-    console.error('Database connection failed:', err.stack);
-    return;
+(async () => {
+  try {
+    connection = await mysql.createConnection({
+      host: process.env.DB_HOST || 'localhost',
+      user: process.env.DB_USER || 'Snowbit',
+      password: process.env.DB_PASSWORD || '5am15.tl',
+      database: process.env.DB_NAME || 'tracelink_db'
+    });
+    console.log('✅ Connected to MySQL database');
+  } catch (err) {
+    console.error('❌ DB connection failed:', err);
   }
-  console.log('Connected to MySQL database.');
-});
+})();
 
-module.exports = connection;
+module.exports = {
+  query: (...args) => connection.query(...args)
+};
+

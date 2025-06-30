@@ -11,8 +11,8 @@
           <th>Estimated Age</th>
           <th>Gender</th>
           <th>Physical Description</th>
-          <th>Clothing Description</th>
-          <th>Special Characteristics</th>
+          <!-- <th>Clothing Description</th>
+          <th>Special Characteristics</th> -->
           <th>Hospital Name</th>
           <th>Hospital Contact</th>
         </tr>
@@ -20,12 +20,12 @@
       <tbody>
         <tr v-for="body in unidentifiedBodies" :key="body.id">
           <td>{{ body.date_found }}</td>
-          <td>{{ body.location_found }}</td>
-          <td>{{ body.estimated_age }}</td>
+          <td>{{ body.found_location }}</td>
+          <td>{{ body.age_estimate }}</td>
           <td>{{ body.gender }}</td>
           <td>{{ body.physical_description }}</td>
-          <td>{{ body.clothing_description }}</td>
-          <td>{{ body.special_characteristics }}</td>
+          <!-- <td>{{ body.clothing_description }}</td>
+          <td>{{ body.special_characteristics }}</td> -->
           <td>{{ body.hospital_name }}</td>
           <td>{{ body.hospital_contact }}</td>
         </tr>

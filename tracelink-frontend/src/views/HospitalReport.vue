@@ -1,7 +1,17 @@
 <template>
-  <div class="form-container">
+  <div class="report-form-container">
     <h2>🏥 Report Unidentified Body</h2>
     <form @submit.prevent="submitForm" enctype="multipart/form-data">
+      <div class="form-group">
+        <label>Hospital Name</label>
+        <input v-model="form.hospital_name" required />
+      </div>
+
+      <div class="form-group">
+        <label>Hospital Contact</label>
+        <input v-model="form.hospital_contact" required />
+      </div>
+
       <div class="form-group">
         <label>Gender</label>
         <select v-model="form.gender" required>
@@ -47,6 +57,8 @@ export default {
   data() {
     return {
       form: {
+        hospital_name: '',
+        hospital_contact: '',
         gender: '',
         age_estimate: '',
         found_location: '',
@@ -67,7 +79,7 @@ export default {
       }
 
       try {
-        const res = await fetch('http://localhost:3000/api/unidentified-bodies', {
+        const res = await fetch('http://localhost:5000/api/unidentified-bodies', {
           method: 'POST',
           body: formData
         });
@@ -97,7 +109,7 @@ export default {
 
 h2 {
   text-align: center;
-   margin-bottom: 20px;
+  margin-bottom: 20px;
   color: #800000;
 }
 
@@ -111,10 +123,10 @@ label {
   margin-top: 15px;
 }
 
-input, select {
+input, select, textarea {
   width: 100%;
   padding: 10px;
-   margin-top: 5px;
+  margin-top: 5px;
   border: 1px solid #ccc;
   border-radius: 6px;
 }
