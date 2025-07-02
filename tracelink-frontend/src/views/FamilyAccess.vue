@@ -30,7 +30,7 @@ export default {
   methods: {
     async fetchStatus() {
       try {
-        const res = await fetch(`http://localhost:3000/api/family-access/${this.accessCode}`);
+        const res = await fetch(`http://localhost:5000/api/family-access/${this.accessCode}`);
         const data = await res.json();
         if (res.ok) {
           this.person = data;

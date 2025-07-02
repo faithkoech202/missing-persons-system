@@ -1,58 +1,56 @@
 <!-- src/views/SearchMissing.vue -->
 <template>
   <div class="container">
-    <h2>🔍 Search Missing Person</h2>
-    <input v-model="searchQuery" placeholder="Enter name or location..." @input="searchMissing" />
+    <h2>🔍 Search Missing Persons</h2>
 
-    <table v-if="results.length">
-      <thead>
-        <tr>
-          <th>Full Name</th>
-          <th>Gender</th>
-          <th>Last Seen Location</th>
-          <th>Date Last Seen</th>
-          <th>Action</th>
-        </tr>
-      </thead>
-      <tbody>
-        <tr v-for="person in results" :key="person.id">
-          <td>{{ person.full_name }}</td>
-          <td>{{ person.gender }}</td>
-          <td>{{ person.last_seen_location }}</td>
-          <td>{{ person.date_last_seen }}</td>
-          <td><router-link :to="`/missing/${person.id}`">View</router-link></td>
-        </tr>
-      </tbody>
-    </table>
+    <input
+      type="text"
+      v-model="searchTerm"
+      @input="search"
+      placeholder="Enter full name..."
+    />
 
-    <p v-else>No matching records found.</p>
+    <div v-if="loading">Searching...</div>
+
+    <ul v-if="results.length">
+      <li v-for="person in results" :key="person.id">
+        <strong>{{ person.full_name }}</strong> — Last seen at {{ person.last_seen_location }}
+      </li>
+    </ul>
+
+    <p v-if="!loading && results.length === 0 && searchTerm">No results found.</p>
   </div>
 </template>
 
 <script>
-import api from '../api';
+import axios from 'axios';
 
 export default {
   data() {
     return {
-      searchQuery: '',
-      results: []
+      searchTerm: '',
+      results: [],
+      loading: false
     };
   },
   methods: {
-    async searchMissing() {
-      if (this.searchQuery.trim() === '') {
+    async search() {
+      if (!this.searchTerm.trim()) {
         this.results = [];
         return;
       }
 
+      this.loading = true;
       try {
-        const response = await api.get('/missing-persons/search', {
-          params: { query: this.searchQuery }
-        });
-        this.results = response.data;
+        const res = await axios.get(
+          `http://localhost:5000/api/missing-persons/search?query=${encodeURIComponent(this.searchTerm)}`
+        );
+        this.results = res.data;
       } catch (err) {
         console.error('Search error:', err);
+        this.results = [];
+      } finally {
+        this.loading = false;
       }
     }
   }
@@ -61,24 +59,28 @@ export default {
 
 <style scoped>
 .container {
+  max-width: 600px;
+  margin: 50px auto;
   padding: 30px;
-  font-family: 'Poppins', sans-serif;
+  background: white;
+  border-radius: 10px;
+  box-shadow: 0 0 12px rgba(0, 0, 0, 0.1);
 }
+
 input {
-  padding: 10px;
-  width: 300px;
-  margin-bottom: 20px;
-}
-table {
   width: 100%;
-  border-collapse: collapse;
+  padding: 12px;
+  margin-bottom: 20px;
+  font-size: 16px;
 }
-th, td {
-  padding: 10px;
-  border: 1px solid #ccc;
+
+ul {
+  list-style-type: none;
+  padding-left: 0;
 }
-th {
-  background-color: #00509e;
-  color: white;
+
+li {
+  padding: 10px 0;
+  border-bottom: 1px solid #ddd;
 }
 </style>
