@@ -61,4 +61,7 @@ router.beforeEach((to, from, next) => {
 });
 
 export default router;
-
+app.route('/api/public-reports', methods=['POST'])
+def public_reports():
+    # handle the form data here
+    return jsonify({'access_code': '123456'})

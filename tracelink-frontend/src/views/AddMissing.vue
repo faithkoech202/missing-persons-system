@@ -1,48 +1,83 @@
 <template>
-  <div class="container">
-    <h2>🚔 Report a Missing Person</h2>
-
-    <div v-if="success" class="success-message">
-      <p>✅ Missing person reported successfully!</p>
-      <p><strong>Access Code:</strong> {{ accessCode }}</p>
-      <p>Give this code to the family so they can track the case.</p>
-    </div>
-
-    <form @submit.prevent="submitForm" v-if="!success">
-      <div class="form-group" v-for="(label, key) in inputFields" :key="key">
-        <label>{{ label }}</label>
-        <input
-          v-if="key !== 'description' && key !== 'photo'"
-          :type="key.includes('date') ? 'datetime-local' : 'text'"
-          v-model="form[key]"
-        />
-        <textarea
-          v-else-if="key === 'description'"
-          v-model="form.description"
-          rows="3"
-        ></textarea>
-        <input
-          v-else-if="key === 'photo'"
-          type="file"
-          @change="handleFileUpload"
-        />
+  <div class="report-container">
+    <h2> Report a Missing Person</h2>
+    <form @submit.prevent="submitReport" enctype="multipart/form-data">
+      <div class="form-group">
+        <label>Full Name:</label>
+        <input v-model="form.full_name" required />
       </div>
 
       <div class="form-group">
-        <label>Gender</label>
+        <label>Date of Birth:</label>
+        <input type="date" v-model="form.date_of_birth" />
+      </div>
+
+      <div class="form-group">
+        <label>Gender:</label>
         <select v-model="form.gender" required>
-          <option disabled value="">Select Gender</option>
+          <option value="">--Select--</option>
           <option>Male</option>
           <option>Female</option>
+          <option>Other</option>
         </select>
+      </div>
+
+      <div class="form-group">
+        <label>Last Seen Location:</label>
+        <input v-model="form.last_seen_location" required />
+      </div>
+
+      <div class="form-group">
+        <label>Date Last Seen:</label>
+        <input type="date" v-model="form.date_last_seen" required />
+      </div>
+
+      <div class="form-group">
+        <label>Reporter Name:</label>
+        <input v-model="form.reporter_name" required />
+      </div>
+
+      <div class="form-group">
+        <label>Reporter Phone:</label>
+        <input type="tel" v-model="form.reporter_phone" required />
+      </div>
+
+      <div class="form-group">
+        <label>Distinguishing Marks:</label>
+        <input v-model="form.distinguishing_marks" />
+      </div>
+
+      <div class="form-group">
+        <label>Medical Conditions:</label>
+        <input v-model="form.medical_conditions" />
+      </div>
+
+      <div class="form-group">
+        <label>Social Media Handles:</label>
+        <input v-model="form.social_media" />
+      </div>
+
+      <div class="form-group">
+        <label>Description:</label>
+        <textarea v-model="form.description"></textarea>
+      </div>
+
+      <div class="form-group">
+        <label>Upload Photo:</label>
+        <input type="file" @change="handlePhotoUpload" accept="image/*" />
       </div>
 
       <button type="submit">Submit Report</button>
     </form>
+
+    <p v-if="successMessage" class="success">{{ successMessage }}</p>
+    <p v-if="errorMessage" class="error">{{ errorMessage }}</p>
   </div>
 </template>
 
 <script>
+import axios from 'axios';
+
 export default {
   data() {
     return {
@@ -60,70 +95,31 @@ export default {
         description: '',
         photo: null
       },
-      accessCode: '',
-      success: false,
-      inputFields: {
-        full_name: 'Full Name',
-        date_of_birth: 'Date of Birth',
-        last_seen_location: 'Last Seen Location',
-        date_last_seen: 'Date & Time Last Seen',
-        reporter_name: 'Reporter Name',
-        reporter_phone: 'Reporter Phone',
-        distinguishing_marks: 'Distinguishing Marks',
-        medical_conditions: 'Medical Conditions',
-        social_media: 'Social Media Handles',
-        description: 'Additional Description',
-        photo: 'Upload Photo'
-      }
+      successMessage: '',
+      errorMessage: ''
     };
   },
   methods: {
-    handleFileUpload(event) {
+    handlePhotoUpload(event) {
       this.form.photo = event.target.files[0];
     },
-    async submitForm() {
-  const formData = new FormData();
-  for (const key in this.form) {
-    if (key === 'photo' && this.form[key] == null) continue;
-    formData.append(key, this.form[key]);
-  }
+    async submitReport() {
+      const formData = new FormData();
+      for (const key in this.form) {
+        formData.append(key, this.form[key]);
+      }
 
-  const token = localStorage.getItem('token');
-
-  try {
-    const res = await fetch('http://localhost:5000/api/missing-persons', {
-      method: 'POST',
-      headers: {
-        Authorization: `Bearer ${token}`
-      },
-      body: formData
-    });
-
-    const data = await res.json();
-    console.log('Server Response:', data);
-
-    if (res.ok) {
-      // ✅ Show success message
-      this.accessCode = data.access_code;
-      this.success = true;
-
-      // ✅ Scroll to top so user sees the message
-      window.scrollTo({ top: 0, behavior: 'smooth' });
-
-      // ✅ Delay resetting the form and hiding the message
-      setTimeout(() => {
+      try {
+        await axios.post('http://localhost:5000/api/public-reports', formData);
+        this.successMessage = 'Report submitted successfully!';
+        this.errorMessage = '';
         this.resetForm();
-        this.success = false;
-      }, 5000); // 5 seconds
-    } else {
-      alert(data.message || 'Something went wrong.');
-    }
-  } catch (err) {
-    alert('Error submitting form.');
-    console.error(err);
-  }
-},
-
+      } catch (error) {
+        console.error('Submission error:', error);
+        this.errorMessage = 'Failed to submit the report.';
+        this.successMessage = '';
+      }
+    },
     resetForm() {
       this.form = {
         full_name: '',
@@ -145,55 +141,49 @@ export default {
 </script>
 
 <style scoped>
-.container {
+.report-container {
   max-width: 600px;
-  margin: 50px auto;
-  padding: 30px;
-  background: white;
+  margin: 40px auto;
+  padding: 25px;
+  border: 1px solid #ddd;
+  background: #fefefe;
   border-radius: 10px;
-  box-shadow: 0 0 12px rgba(0, 0, 0, 0.1);
+  font-family: 'Segoe UI', sans-serif;
 }
 h2 {
-  text-align: center;
   margin-bottom: 20px;
-  color: #003366;
+  text-align: center;
 }
 .form-group {
   margin-bottom: 15px;
 }
 label {
   display: block;
-  font-weight: 600;
   margin-bottom: 5px;
 }
 input,
 select,
 textarea {
   width: 100%;
-  padding: 10px;
-  border: 1px solid #ccc;
+  padding: 8px;
   border-radius: 6px;
-  font-size: 14px;
+  border: 1px solid #ccc;
 }
 button {
-  margin-top: 10px;
-  width: 100%;
-  background: #003366;
+  background-color: #007acc;
   color: white;
-  font-weight: bold;
-  padding: 12px;
+  padding: 10px 20px;
   border: none;
   border-radius: 6px;
   cursor: pointer;
 }
-button:hover {
-  background: #00509e;
+.success {
+  color: green;
+  margin-top: 15px;
 }
-.success-message {
-  background-color: #e6ffed;
-  border-left: 5px solid #28a745;
-  padding: 15px;
-  margin-bottom: 20px;
-  border-radius: 6px;
+.error {
+  color: red;
+  margin-top: 15px;
 }
 </style>
+

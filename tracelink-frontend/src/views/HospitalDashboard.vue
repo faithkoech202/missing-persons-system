@@ -1,6 +1,6 @@
 <template>
   <div class="dashboard">
-    <h2>🏥 Hospital Dashboard</h2>
+    <h2>Hospital Dashboard</h2>
 
     <div class="buttons">
       <router-link to="/hospital-report" class="btn">Report Unidentified Body</router-link>

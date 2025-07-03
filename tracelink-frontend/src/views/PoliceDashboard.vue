@@ -1,13 +1,13 @@
 <template>
   <div class="dashboard">
-    <h1>👮 Police Dashboard</h1>
+    <h1> Police Dashboard</h1>
     <p>Welcome, officer. Use the options below to manage missing persons cases.</p>
 
     <div class="buttons">
-      <router-link to="/add-missing" class="btn">➕ Report New Missing Person</router-link>
-      <router-link to="/all-missing" class="btn">📋 View All Missing Persons</router-link>
-      <router-link to="/search-missing" class="btn">🔍 Search Missing Persons</router-link>
-      <router-link to="/match-unidentified" class="btn">🧬 Match Unidentified Bodies</router-link>
+      <router-link to="/add-missing" class="btn"> Report New Missing Person</router-link>
+      <router-link to="/all-missing" class="btn"> View All Missing Persons</router-link>
+      <router-link to="/search-missing" class="btn"> Search Missing Persons</router-link>
+      <router-link to="/match-unidentified" class="btn"> Match Unidentified Bodies</router-link>
     </div>
   </div>
 </template>

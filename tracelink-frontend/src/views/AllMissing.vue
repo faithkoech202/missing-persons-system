@@ -1,7 +1,6 @@
-<!-- src/views/AllMissing.vue -->
 <template>
   <div class="container">
-    <h2>🕵️ All Reported Missing Persons</h2>
+    <h2> All Reported Missing Persons</h2>
 
     <table>
       <thead>
@@ -37,7 +36,6 @@
       <td>{{ person.access_code }}</td>
       <td>{{ person.date_reported }}</td>
           <td>
-            <!-- ✅ View Details Link -->
             <router-link :to="`/missing/${person.id}`" class="view-link">View</router-link>
             <router-link :to="`/missing/${person.id}/edit`">Edit</router-link>
           </td>
@@ -48,7 +46,7 @@
 </template>
 
 <script>
-import api from '../api'; // Axios instance you set up in frontend
+import api from '../api';
 
 export default {
   data() {

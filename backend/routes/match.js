@@ -22,11 +22,13 @@ router.get('/match-bodies', async (req, res) => {
   `;
 
   try {
+    console.log('Running SQL:', sql); // Debug log
     const [results] = await db.query(sql);
     res.json(results);
   } catch (err) {
     console.error('Error matching bodies:', err);
-    res.status(500).json({ error: 'Internal server error' });
+    // Send error details for debugging (remove in production)
+    res.status(500).json({ error: 'Internal server error', details: err });
   }
 });
 

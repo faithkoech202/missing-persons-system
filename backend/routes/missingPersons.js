@@ -25,7 +25,7 @@ router.post('/', verifyToken, upload.single('photo'), (req, res) => {
   } = req.body;
 
   const photoBuffer = req.file ? req.file.buffer : null;
-  const access_code = uuidv4().slice(0, 8); // 8-character unique code
+  const access_code = uuidv4().slice(0, 8);
 
   const sql = `
     INSERT INTO missing_persons (
@@ -87,6 +87,26 @@ router.get('/', async (req, res) => {
   }
 });
 
+// Search for missing persons by full name
+router.get('/search', (req, res) => {
+  const searchTerm = req.query.query;
+
+  if (!searchTerm) {
+    return res.status(400).json({ message: 'Search term is required' });
+  }
+
+  const sql = 'SELECT * FROM missing_persons WHERE LOWER(full_name) LIKE ?';
+  db.query(sql, [`%${searchTerm.toLowerCase()}%`], (err, results) => {
+    if (err) {
+      console.error('Search error:', err);
+      // Send error details for debugging (remove in production)
+      return res.status(500).json({ message: 'Server error', error: err });
+    }
+
+    res.json(results);
+  });
+});
+
 // GET /api/missing-persons/:id
 router.get('/:id', async (req, res) => {
   const { id } = req.params;
@@ -125,21 +145,10 @@ router.get('/family-access/:access_code', async (req, res) => {
   }
 });
 
-// Search for missing persons by full name
-router.get('/search', (req, res) => {
-  const searchTerm = req.query.query;
-
-  if (!searchTerm) {
-    return res.status(400).json({ message: 'Search term is required' });
-  }
-
-  const sql = 'SELECT * FROM missing_persons WHERE full_name LIKE ?';
-  db.query(sql, [`%${searchTerm}%`], (err, results) => {
-    if (err) {
-      console.error('Search error:', err);
-      return res.status(500).json({ message: 'Server error' });
-    }
-
+router.get('/public', (req, res) => {
+  const sql = "SELECT * FROM missing_persons WHERE reporter_type = 'public'";
+  db.query(sql, (err, results) => {
+    if (err) return res.status(500).json({ message: 'DB error' });
     res.json(results);
   });
 });

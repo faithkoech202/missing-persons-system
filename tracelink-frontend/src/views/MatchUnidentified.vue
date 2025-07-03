@@ -1,12 +1,12 @@
 <!-- src/views/MatchUnidentified.vue -->
 <template>
   <div class="container">
-    <h2>🧩 Match Unidentified Bodies</h2>
+    <h2> Match Unidentified Bodies</h2>
 
     <button @click="matchData" :disabled="loading">
       {{ loading ? 'Searching...' : 'Find Possible Matches' }}
     </button>
-
+    <div v-if="error && !loading" class="no-match">{{ error }}</div>
     <div v-if="matches.length">
       <div v-for="(match, index) in matches" :key="index" class="match-card">
         <p><strong>Missing Person:</strong> {{ match.missing_name }}</p>
@@ -14,8 +14,7 @@
         <p><strong>Found Location:</strong> {{ match.found_location }}</p>
       </div>
     </div>
-
-    <p v-else-if="!loading" class="no-match">No matches found yet.</p>
+    <p v-else-if="!loading && !error" class="no-match">No matches found yet.</p>
   </div>
 </template>
 
@@ -26,18 +25,25 @@ export default {
   data() {
     return {
       matches: [],
-      loading: false
+      loading: false,
+      error: ''
     };
   },
   methods: {
     async matchData() {
       this.loading = true;
+      this.error = '';
       try {
         const response = await api.get('/match/match-bodies');
-        this.matches = response.data || [];
+        console.log('Match response:', response.data); // Debug log
+        this.matches = Array.isArray(response.data) ? response.data : [];
+        if (!this.matches.length) {
+          this.error = 'No matches found.';
+        }
       } catch (err) {
         console.error('Matching error:', err);
-        alert('Error fetching matches.');
+        this.error = 'Error fetching matches.';
+        this.matches = [];
       } finally {
         this.loading = false;
       }

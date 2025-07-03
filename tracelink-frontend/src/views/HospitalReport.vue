@@ -1,6 +1,6 @@
 <template>
   <div class="report-form-container">
-    <h2>🏥 Report Unidentified Body</h2>
+    <h2> Report Unidentified Body</h2>
     <form @submit.prevent="submitForm" enctype="multipart/form-data">
       <div class="form-group">
         <label>Hospital Name</label>

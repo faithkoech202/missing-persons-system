@@ -1,7 +1,7 @@
 <!-- src/views/AllUnidentified.vue -->
 <template>
   <div class="container">
-    <h2>🧍 All Unidentified Bodies</h2>
+    <h2> All Unidentified Bodies</h2>
 
     <table>
       <thead>

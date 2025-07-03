@@ -1,6 +1,6 @@
 <template>
   <div class="search-container">
-    <h2>🔍 Search Unidentified Bodies</h2>
+    <h2>Search Unidentified Bodies</h2>
 
     <form @submit.prevent="search">
       <label for="date">Date Found:</label>

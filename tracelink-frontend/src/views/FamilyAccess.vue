@@ -1,6 +1,6 @@
 <template>
   <div class="container">
-    <h2>👨‍👩‍👧 Family Access Portal</h2>
+    <h2> Family Access Portal</h2>
 
     <div v-if="!person">
       <label>Enter Access Code</label>

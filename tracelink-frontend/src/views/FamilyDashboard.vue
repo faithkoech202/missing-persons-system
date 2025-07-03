@@ -1,7 +1,7 @@
 <!-- src/views/FamilyDashboard.vue -->
 <template>
   <div class="dashboard">
-    <h2>👥 Family Access Dashboard</h2>
+    <h2>Family Access Dashboard</h2>
 
     <!-- Access Code Input -->
     <div class="access-form">
